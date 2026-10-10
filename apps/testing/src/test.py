@@ -1,28 +1,26 @@
 
+from asi_tracer import instrument_llm_provider,instrument_gemini
 import os
 from dotenv import load_dotenv
 
 # Load environment variables before initializing tracing
-load_dotenv()
+env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+load_dotenv(dotenv_path=env_path)
 
-from langsmith import traceable
+from asi_tracer import traceable, instrument_gemini
 from google import genai
 
 # Initialize the Google Gemini client
 client = genai.Client(
     api_key=os.getenv("GOOGLE_API_KEY")
 )
+instrument_gemini(client)
 
 
 @traceable(name="format_prompt")
 def format_prompt(subject: str) -> str:
     """Build the prompt for the LLM."""
-    return f"""
-    Explain the following subject in simple terms:
-    {subject}
-
-    Give a clear explanation and one example.
-    """
+    return f"Explain {subject} in exactly 1 concise sentence."
 
 
 @traceable(name="invoke_llm", run_type="llm")
