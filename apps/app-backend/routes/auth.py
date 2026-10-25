@@ -28,9 +28,10 @@ from auth.schemas import (
     RefreshTokenRequest,
     SignupRequest,
     TokenResponse,
+    UpdateProfileRequest,
     UserResponse,
 )
-from auth.service import login, signup
+from auth.service import login, signup, update_profile
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -55,6 +56,17 @@ def login_endpoint(payload: LoginRequest):
 def current_user_endpoint(current_user: UserResponse = Depends(get_current_user)):
     """Return the account associated with the supplied Bearer token."""
     return current_user
+
+
+@router.put("/profile", response_model=UserResponse)
+@router.patch("/profile", response_model=UserResponse)
+@router.put("/me", response_model=UserResponse)
+def update_profile_endpoint(
+    payload: UpdateProfileRequest,
+    current_user: UserResponse = Depends(get_current_user),
+):
+    """Updates the authenticated user's display name and/or password."""
+    return update_profile(current_user.id, payload)
 
 
 # ---------------------------------------------------------------------------

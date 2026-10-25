@@ -11,7 +11,7 @@ import {
   MetricSummary,
   ApplicationMetadata,
 } from "./dashboard-types";
-import { getAuthHeaders } from "@/lib/auth";
+import { getAuthHeaders, clearStoredUser } from "@/lib/auth";
 import { getBackendUrl } from "@/lib/api-config";
 
 interface DashboardContextType {
@@ -104,6 +104,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch(`${getBackendUrl()}/api/dashboard?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
+      if (res.status === 401) {
+        clearStoredUser();
+        if (typeof window !== "undefined") {
+          window.location.href = `/login?from=${encodeURIComponent(window.location.pathname)}`;
+        }
+        return;
+      }
       if (res.ok) {
         const payload = await res.json();
 

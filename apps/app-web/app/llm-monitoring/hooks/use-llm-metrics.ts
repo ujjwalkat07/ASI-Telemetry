@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { LLMMetricsSummary, TimeRange } from "../types";
-import { getAuthHeaders } from "@/lib/auth";
+import { getAuthHeaders, clearStoredUser } from "@/lib/auth";
 import { getBackendUrl } from "@/lib/api-config";
 
 const INITIAL_SUMMARY: LLMMetricsSummary = {
@@ -61,6 +61,13 @@ export function useLLMMetrics() {
         const res = await fetch(url, {
           headers: getAuthHeaders(),
         });
+        if (res.status === 401) {
+          clearStoredUser();
+          if (typeof window !== "undefined") {
+            window.location.href = `/login?from=${encodeURIComponent(window.location.pathname)}`;
+          }
+          return;
+        }
         if (res.ok) {
           const data = await res.json();
           if (data.summary) setSummary(data.summary);

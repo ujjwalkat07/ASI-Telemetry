@@ -35,8 +35,36 @@ export function removeCookie(name: string): void {
 
 // ── Auth Token Helpers (Saved exclusively in Cookies) ─────────────────────────
 
+export function isTokenExpired(token: string | null | undefined): boolean {
+  if (!token) return true;
+  if (token.startsWith("asi_")) return false;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3 || !parts[1]) return false;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    const parsed = JSON.parse(jsonPayload);
+    if (!parsed.exp) return false;
+    return Date.now() >= parsed.exp * 1000 - 15000;
+  } catch {
+    return false;
+  }
+}
+
 export function getAuthToken(): string | null {
-  return getCookie(TOKEN_COOKIE_NAME);
+  const token = getCookie(TOKEN_COOKIE_NAME);
+  if (!token) return null;
+  if (isTokenExpired(token)) {
+    clearStoredUser();
+    return null;
+  }
+  return token;
 }
 
 export function setAuthToken(token: string, days = 30): void {
@@ -180,6 +208,75 @@ export async function signupUser(
     saveStoredUser(user, 30);
 
     return { success: true, user, token };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: "Unable to reach the backend service. Please check your network connection.",
+    };
+  }
+}
+
+export async function updateUserProfile(payload: {
+  name?: string;
+  currentPassword?: string;
+  newPassword?: string;
+}): Promise<{ success: boolean; error?: string; user?: AuthUser }> {
+  try {
+    const backendUrl = getBackendUrl();
+    const token = getAuthToken();
+    if (!token) {
+      return {
+        success: false,
+        error: "Authentication session expired. Please log in again.",
+      };
+    }
+
+    const body: Record<string, string> = {};
+    if (payload.name !== undefined && payload.name.trim()) {
+      body.name = payload.name.trim();
+    }
+    if (payload.currentPassword) {
+      body.current_password = payload.currentPassword;
+    }
+    if (payload.newPassword) {
+      body.new_password = payload.newPassword;
+    }
+
+    const res = await fetch(`${backendUrl}/api/auth/profile`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      const errorMsg =
+        typeof data.detail === "string"
+          ? data.detail
+          : Array.isArray(data.detail)
+          ? data.detail.map((d: any) => d.msg).join(", ")
+          : "Failed to update profile. Please try again.";
+      return { success: false, error: errorMsg };
+    }
+
+    const currentUser = getStoredUser();
+    const updatedUser: AuthUser = {
+      id: data.id || currentUser?.id || "",
+      name: data.name || currentUser?.name || "",
+      email: data.email || currentUser?.email || "",
+      created_at: data.created_at || currentUser?.created_at,
+      default_api_key: currentUser?.default_api_key,
+    };
+
+    saveStoredUser(updatedUser, 30);
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("asi-user-updated", { detail: updatedUser })
+      );
+    }
+
+    return { success: true, user: updatedUser };
   } catch (err: any) {
     return {
       success: false,

@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getAuthHeaders, getStoredUser } from "@/lib/auth";
+import { getAuthHeaders, getStoredUser, clearStoredUser } from "@/lib/auth";
 import { getBackendUrl } from "@/lib/api-config";
 
 export interface LLMTraceItem {
@@ -78,6 +78,13 @@ export default function LLMTracingPage() {
       const res = await fetch(`${getBackendUrl()}/api/llm/traces?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
+      if (res.status === 401) {
+        clearStoredUser();
+        if (typeof window !== "undefined") {
+          window.location.href = `/login?from=${encodeURIComponent(window.location.pathname)}`;
+        }
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         const realTraces: LLMTraceItem[] = data.traces || [];

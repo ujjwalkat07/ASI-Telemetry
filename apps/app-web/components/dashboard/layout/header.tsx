@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Settings } from "lucide-react";
 import { useDashboard } from "../context/dashboard-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -43,6 +43,16 @@ export function DashboardHeader({
         >
           <KeyRound className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">API Keys</span>
+        </Link>
+
+        {/* Profile & Settings Shortcut */}
+        <Link
+          href="/settings"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 text-xs font-medium shadow-xs hover:bg-muted hover:text-foreground"
+          title="Profile & Settings"
+        >
+          <Settings className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Settings</span>
         </Link>
 
         {/* Light & Dark Mode Switch */}

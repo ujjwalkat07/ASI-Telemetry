@@ -7,6 +7,8 @@ import time
 import argparse
 import urllib.request
 import urllib.error
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -68,7 +70,12 @@ def seed_data(include_metrics: bool = True, include_traces: bool = True, delay: 
     if include_metrics:
         print("\n📊 Ingesting Tool & System Metrics into /api/metrics...")
         for idx, metric in enumerate(metrics, start=1):
-            metric_payload = {**metric, "api_key": API_KEY}
+            now_str = datetime.now(timezone.utc).isoformat()
+            metric_payload = {
+                **metric,
+                "timestamp": now_str,
+                "api_key": API_KEY,
+            }
             status, res = post_json("/api/metrics", metric_payload)
             if status in (200, 201):
                 metric_success += 1
@@ -83,7 +90,16 @@ def seed_data(include_metrics: bool = True, include_traces: bool = True, delay: 
     if include_traces:
         print("\n🧠 Ingesting LLM Traces into /api/llm/traces...")
         for idx, trace in enumerate(traces, start=1):
-            trace_payload = {**trace, "api_key": API_KEY}
+            now_str = datetime.now(timezone.utc).isoformat()
+            trace_payload = {
+                **trace,
+                "id": str(uuid.uuid4()),
+                "trace_id": str(uuid.uuid4()),
+                "span_id": str(uuid.uuid4()),
+                "start_time": now_str,
+                "end_time": now_str,
+                "api_key": API_KEY,
+            }
             status, res = post_json("/api/llm/traces", trace_payload)
             if status in (200, 201):
                 trace_success += 1

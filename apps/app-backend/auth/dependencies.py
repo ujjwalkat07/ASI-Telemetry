@@ -78,13 +78,16 @@ def resolve_request_user_id(request: Request, body_dict: Optional[dict] = None) 
             if uid:
                 return uid
         else:
-            try:
-                payload = decode_access_token(token)
-                sub = payload.get("sub")
-                if sub:
-                    return str(sub)
-            except Exception:
-                pass
+            payload = decode_access_token(token)
+            if not payload:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Session expired or invalid access token. Please log in again.",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            sub = payload.get("sub")
+            if sub:
+                return str(sub)
 
     # 3. Query parameters
     param_key = request.query_params.get("api_key")

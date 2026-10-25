@@ -22,6 +22,22 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=2, max_length=80)
+    current_password: Optional[str] = Field(default=None, min_length=1, max_length=128)
+    new_password: Optional[str] = Field(default=None, min_length=8, max_length=128)
+
+    @field_validator("name")
+    @classmethod
+    def clean_name(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        value = value.strip()
+        if len(value) < 2:
+            raise ValueError("Name must contain at least 2 non-space characters")
+        return value
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

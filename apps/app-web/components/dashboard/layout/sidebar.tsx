@@ -54,6 +54,15 @@ export function DashboardSidebar({
 
   React.useEffect(() => {
     setCurrentUser(getStoredUser());
+    const handleUserUpdate = (e: any) => {
+      if (e.detail) {
+        setCurrentUser(e.detail);
+      } else {
+        setCurrentUser(getStoredUser());
+      }
+    };
+    window.addEventListener("asi-user-updated", handleUserUpdate);
+    return () => window.removeEventListener("asi-user-updated", handleUserUpdate);
   }, []);
 
   const navigationGroups: NavGroup[] = [
@@ -77,6 +86,7 @@ export function DashboardSidebar({
       group: "Access & Security",
       items: [
         { label: "API Keys", href: "/api-keys", icon: KeyRound, badge: "Active" },
+        { label: "Profile & Settings", href: "/settings", icon: Settings },
       ],
     },
   ];
@@ -236,9 +246,9 @@ export function DashboardSidebar({
         {!collapsed && (
           <div className="flex items-center justify-between gap-2 px-2 py-1.5 border-t border-border pt-2">
             <Link
-              href="/api-keys"
+              href="/settings"
               className="flex items-center gap-2.5 overflow-hidden flex-1 group hover:opacity-80 transition-opacity"
-              title="Manage API Keys & Profile"
+              title="Account Profile & Settings"
             >
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold text-xs shrink-0 shadow-xs">
                 {currentUser?.name

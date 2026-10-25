@@ -132,7 +132,7 @@ async def test_handoff_exchange_success():
     assert tokens["access_token"] is not None
     assert tokens["refresh_token"].startswith("asi_rf_")
     assert tokens["token_type"] == "bearer"
-    assert tokens["expires_in"] == 900  # 15 minutes = 900s
+    assert tokens["expires_in"] == settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     assert "user" in tokens
 
 

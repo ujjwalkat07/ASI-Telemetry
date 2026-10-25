@@ -190,6 +190,49 @@ def insert_user(user_id: str, name: str, email: str, password_hash: str, created
     }
 
 
+def update_user(
+    user_id: str,
+    name: Optional[str] = None,
+    password_hash: Optional[str] = None,
+) -> bool:
+    """Updates user name and/or password hash in ClickHouse and memory store."""
+    clean_id = str(user_id)
+    updated = False
+
+    # 1. Update in-memory store
+    with _db_lock:
+        if clean_id in _memory_users:
+            if name is not None:
+                _memory_users[clean_id]["name"] = name
+            if password_hash is not None:
+                _memory_users[clean_id]["password_hash"] = password_hash
+            updated = True
+
+    # 2. Update ClickHouse if connected
+    if db_connection.is_connected and db_connection.client:
+        try:
+            assignments = []
+            params: Dict[str, Any] = {"id": clean_id}
+            if name is not None:
+                assignments.append("name = %(name)s")
+                params["name"] = name
+            if password_hash is not None:
+                assignments.append("password_hash = %(password_hash)s")
+                params["password_hash"] = password_hash
+
+            if assignments:
+                set_clause = ", ".join(assignments)
+                db_connection.safe_command(
+                    f"ALTER TABLE users UPDATE {set_clause} WHERE id = %(id)s",
+                    parameters=params,
+                )
+                updated = True
+        except Exception as e:
+            logger.warning(f"ClickHouse update error in update_user: {e}")
+
+    return updated
+
+
 # In-memory storage for refresh tokens: token_hash -> record
 _tokens_lock = _db_lock
 
