@@ -1,0 +1,250 @@
+{
+  "description": "Comprehensive dummy test data, mock telemetry metrics, LLM traces, and agent test payloads for ASI-Telemetry & Fetch.ai uAgents",
+  "version": "1.0.0",
+  "agent_profile": {
+    "name": "sample_demo_agent",
+    "address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+    "port": 8300,
+    "environment": "production",
+    "version": "1.2.0"
+  },
+  "sample_agent_requests": [
+    {
+      "id": "req-status-001",
+      "description": "Healthy agent status check",
+      "query_type": "status",
+      "payload": {
+        "service": "sample_demo_agent",
+        "uptime_seconds": 7200,
+        "cluster": "us-east-fetch-1"
+      },
+      "expected_outcome": "success"
+    },
+    {
+      "id": "req-analytics-001",
+      "description": "Valid analytics computation with full token metrics",
+      "query_type": "analytics",
+      "payload": {
+        "prompt_tokens": 520,
+        "completion_tokens": 140,
+        "model": "gemini-2.5-flash",
+        "session_id": "sess_89f02a1b"
+      },
+      "expected_outcome": "success"
+    },
+    {
+      "id": "req-analytics-002",
+      "description": "Large batch analytics payload",
+      "query_type": "analytics",
+      "payload": {
+        "prompt_tokens": 18500,
+        "completion_tokens": 4200,
+        "model": "gemini-1.5-pro",
+        "session_id": "sess_b72940cd"
+      },
+      "expected_outcome": "success"
+    },
+    {
+      "id": "req-defect-001",
+      "description": "Intentional defect trigger: missing 'completion_tokens' key in payload",
+      "query_type": "analytics",
+      "payload": {
+        "prompt_tokens": 350
+      },
+      "expected_outcome": "error_keyerror"
+    },
+    {
+      "id": "req-defect-002",
+      "description": "Intentional defect trigger: empty payload",
+      "query_type": "analytics",
+      "payload": {},
+      "expected_outcome": "error_keyerror"
+    }
+  ],
+  "dummy_metrics": [
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "format_agent_status",
+      "status": "success",
+      "response_time_ms": 14.8,
+      "memory_before_mb": 42.1,
+      "memory_after_mb": 42.3,
+      "metadata": {
+        "environment": "production",
+        "version": "1.2.0",
+        "cluster": "us-east-fetch-1"
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "compute_analytics",
+      "status": "success",
+      "response_time_ms": 32.5,
+      "memory_before_mb": 42.3,
+      "memory_after_mb": 43.1,
+      "metadata": {
+        "tokens_processed": 660,
+        "model": "gemini-2.5-flash",
+        "estimated_cost_usd": 0.0162
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "fetch_crypto_rates",
+      "status": "success",
+      "response_time_ms": 182.4,
+      "memory_before_mb": 43.1,
+      "memory_after_mb": 43.8,
+      "metadata": {
+        "source": "Fetch.ai Network Oracle",
+        "pairs": ["FET/USD", "ASI/USD", "ETH/USD"]
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "verify_agent_signature",
+      "status": "success",
+      "response_time_ms": 8.7,
+      "memory_before_mb": 43.8,
+      "memory_after_mb": 43.9,
+      "metadata": {
+        "algorithm": "ed25519",
+        "verified": true
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "sync_clickhouse_records",
+      "status": "success",
+      "response_time_ms": 94.2,
+      "memory_before_mb": 44.0,
+      "memory_after_mb": 44.5,
+      "metadata": {
+        "records_synced": 150,
+        "batch_id": "b-90184"
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "compute_analytics",
+      "status": "error",
+      "response_time_ms": 48.1,
+      "memory_before_mb": 44.5,
+      "memory_after_mb": 44.6,
+      "metadata": {
+        "error": "KeyError: 'completion_tokens'",
+        "error_type": "KeyError",
+        "file": "sample-uagent/tools.py",
+        "line": 32,
+        "exception": "KeyError: 'completion_tokens' in compute_analytics()"
+      }
+    },
+    {
+      "agent_name": "sample_demo_agent",
+      "agent_address": "agent1qwth0xslz63lfs4dx7xn4krnp89a9wknv6xhszg9la9wue639k8x68gs3pm",
+      "func_name": "query_external_datasource",
+      "status": "error",
+      "response_time_ms": 1250.0,
+      "memory_before_mb": 44.6,
+      "memory_after_mb": 45.0,
+      "metadata": {
+        "error": "TimeoutError: Request to endpoint timed out after 1200ms",
+        "error_type": "TimeoutError",
+        "retry_attempt": 3
+      }
+    }
+  ],
+  "dummy_llm_traces": [
+    {
+      "name": "agent_planning_routine",
+      "run_type": "chain",
+      "status": "success",
+      "model": "gemini-2.5-flash",
+      "input": "Determine next execution steps for multi-agent asset transfer workflow",
+      "output": "Plan formulated: 1. Validate signature. 2. Verify account balance. 3. Dispatch transaction to Fetch.ai ledger.",
+      "latency_ms": 284.5,
+      "prompt_tokens": 145,
+      "completion_tokens": 42,
+      "cost_usd": 0.00012,
+      "metadata": {
+        "workflow": "asset_transfer",
+        "agent_name": "sample_demo_agent",
+        "priority": "high"
+      }
+    },
+    {
+      "name": "summarize_fleet_telemetry",
+      "run_type": "llm",
+      "status": "success",
+      "model": "gemini-2.5-flash",
+      "input": "Summarize health and error rates across all 12 worker agents in the fleet",
+      "output": "Fleet Status: 11 agents operational (91.7%). 1 agent reporting transient KeyError in compute_analytics. Overall latency p95: 142ms.",
+      "latency_ms": 320.1,
+      "prompt_tokens": 480,
+      "completion_tokens": 68,
+      "cost_usd": 0.00021,
+      "metadata": {
+        "agent_count": 12,
+        "health_score": 0.92
+      }
+    },
+    {
+      "name": "compute_market_spread",
+      "run_type": "llm",
+      "status": "success",
+      "model": "gemini-1.5-pro",
+      "input": "Evaluate optimal routing for 5,000 FET liquidity swap with slippage tolerance under 0.2%",
+      "output": "Route identified via Osmosis DEX pool #560. Estimated slippage 0.08%, gas cost 0.0012 FET.",
+      "latency_ms": 610.8,
+      "prompt_tokens": 620,
+      "completion_tokens": 85,
+      "cost_usd": 0.00085,
+      "metadata": {
+        "dex": "osmosis",
+        "asset": "FET",
+        "swap_amount": 5000
+      }
+    },
+    {
+      "name": "gemini_reasoning_step",
+      "run_type": "llm",
+      "status": "error",
+      "model": "gemini-3.8-flash",
+      "input": "Calculate token consumption metrics for current billing period",
+      "output": "",
+      "error": "KeyError: 'completion_tokens' in compute_analytics()",
+      "latency_ms": 115.4,
+      "prompt_tokens": 180,
+      "completion_tokens": 0,
+      "cost_usd": 0.00008,
+      "metadata": {
+        "defect_file": "sample-uagent/tools.py",
+        "defect_line": 32,
+        "exception_type": "KeyError",
+        "self_healing_available": true
+      }
+    },
+    {
+      "name": "agent_security_audit",
+      "run_type": "agent",
+      "status": "success",
+      "model": "gemini-2.5-flash",
+      "input": "Audit incoming payload for prompt injection or unauthorized privileged directives",
+      "output": "Payload verified benign. No prompt injection indicators detected. Safe for processing.",
+      "latency_ms": 195.2,
+      "prompt_tokens": 210,
+      "completion_tokens": 24,
+      "cost_usd": 0.00009,
+      "metadata": {
+        "sanitization_passed": true,
+        "risk_score": 0.01
+      }
+    }
+  ]
+}

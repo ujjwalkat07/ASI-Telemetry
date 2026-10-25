@@ -22,7 +22,6 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { CodeBlock, dracula } from "react-code-blocks";
 import { cn } from "@/lib/utils";
-import { GitHubRepoCard } from "@/components/dashboard/github-repo-card";
 
 interface HomeSectionProps {
   apiKey?: string;
@@ -329,9 +328,6 @@ if __name__ == "__main__":
           </div>
         </div>
       </div>
-
-      {/* Connected GitHub Repository & MCP Integration */}
-      <GitHubRepoCard />
 
       {/* Steps Flow */}
       <div className="space-y-8">

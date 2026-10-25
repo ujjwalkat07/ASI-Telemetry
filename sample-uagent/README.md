@@ -47,6 +47,18 @@ python run_local_test.py
    python test_client.py
    ```
 
+### Option C: Seed Realistic Dummy Telemetry
+To populate your dashboard and ASI:One with realistic telemetry data (metrics, LLM traces, multi-model execution, and error traces) directly:
+```bash
+# Seed all dummy metrics & LLM traces from dummy_data.json
+python seed_dummy_data.py
+
+# Or simulate live real-time telemetry streaming every 2s
+python seed_dummy_data.py --stream --interval 2.0
+```
+- **Data File**: [`dummy_data.json`](dummy_data.json) contains preconfigured agent queries, tool metrics, and LLM traces.
+- **Direct Error Injection**: [`inject_dummy_error.py`](inject_dummy_error.py) for testing ASI:One defect diagnosis.
+
 ---
 
 ## 🛠️ Fixing the Defect Live via ASI:One
